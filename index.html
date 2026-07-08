@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<!-- saved from url=(0064)file:///Users/matheus.fideles/Desktop/vitalicia-calculadora.html -->
+<html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora — Lançamento Vitalício</title>
+<style>
+  :root{
+    --azul:#1f47d6;--azul-esc:#15309a;--azul-claro:#eef2ff;--roxo:#7c3aed;--roxoc:#b07ef0;
+    --tinta:#0e1430;--cinza:#5b6580;--linha:#e6e9f2;--fundo:#f6f7fb;
+    --verde:#16a34a;--gold:#f5a524;--branco:#fff;--sombra:0 10px 30px rgba(20,30,70,.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--tinta);background:var(--fundo);line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+
+  .hero{background:linear-gradient(135deg,#0e1430,#1b2350 60%,var(--azul-esc));color:#fff;padding:38px 0 42px}
+  .hero .eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;opacity:.75;font-weight:600}
+  .hero h1{font-size:34px;font-weight:800;letter-spacing:-.02em;margin:8px 0 6px}
+  .hero p{font-size:15px;opacity:.9;max-width:700px}
+
+  /* tabs */
+  .tabbar{display:flex;gap:6px;margin:22px 0 0}
+  .tab{border:1px solid var(--linha);background:#fff;border-radius:12px 12px 0 0;padding:12px 22px;font-size:14.5px;font-weight:700;cursor:pointer;color:var(--cinza);border-bottom:none;transition:.15s}
+  .tab.active{color:var(--azul);background:#fff;box-shadow:0 -4px 14px rgba(20,30,70,.05)}
+  .tab:not(.active):hover{color:var(--tinta)}
+  .tabpane{display:none} .tabpane.show{display:block}
+
+  .presets{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0 4px}
+  .presets b{align-self:center;font-size:13px;color:var(--cinza);margin-right:4px}
+  .pbtn{border:1px solid var(--linha);background:#fff;border-radius:99px;padding:9px 18px;font-size:13.5px;font-weight:700;cursor:pointer;transition:.15s;color:var(--tinta)}
+  .pbtn:hover{border-color:var(--azul);color:var(--azul)}
+  .pbtn.cj:hover{border-color:var(--roxo);color:var(--roxo)}
+
+  .grid{display:grid;grid-template-columns:420px 1fr;gap:24px;margin:18px 0 60px;align-items:start}
+  .panel{background:#fff;border:1px solid var(--linha);border-radius:18px;padding:24px;box-shadow:var(--sombra)}
+  .panel h2{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:18px}
+
+  .field{margin-bottom:20px}
+  .field label{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;font-weight:600;margin-bottom:8px}
+  .field label .hint{font-size:11.5px;color:var(--cinza);font-weight:500}
+  .field label .v{font-size:15px;font-weight:800;color:var(--azul);font-variant-numeric:tabular-nums}
+  input[type=number]{width:100%;border:1px solid var(--linha);border-radius:10px;padding:11px 13px;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--tinta);background:#fafbff}
+  input[type=number]:focus{outline:none;border-color:var(--azul);background:#fff}
+  input[type=range]{width:100%;accent-color:var(--azul);height:6px;margin-top:4px}
+  .field .sub{font-size:11.5px;color:var(--cinza);margin-top:6px}
+  .field .sub b{color:var(--tinta)}
+
+  .out-top{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+  .big{background:#fff;border:1px solid var(--linha);border-radius:16px;padding:22px;box-shadow:var(--sombra)}
+  .big.fat{background:linear-gradient(135deg,#15309a,var(--azul));color:#fff;border:none}
+  .big .lab{font-size:12.5px;font-weight:600;opacity:.85}
+  .big .num{font-size:40px;font-weight:800;letter-spacing:-.02em;margin-top:4px;font-variant-numeric:tabular-nums}
+  .big .sub{font-size:12.5px;opacity:.8;margin-top:2px}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+  .kpi{background:#fff;border:1px solid var(--linha);border-radius:14px;padding:15px;box-shadow:var(--sombra)}
+  .kpi .l{font-size:11.5px;color:var(--cinza);font-weight:600}
+  .kpi .n{font-size:22px;font-weight:800;letter-spacing:-.01em;margin-top:3px;font-variant-numeric:tabular-nums}
+  .kpi .n.green{color:var(--verde)}
+
+  .compbox{background:#fff;border:1px solid var(--linha);border-radius:16px;padding:22px;box-shadow:var(--sombra)}
+  .compbox h3{font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:14px}
+  .seg{display:flex;height:46px;border-radius:12px;overflow:hidden;margin-bottom:16px;box-shadow:var(--sombra)}
+  .seg span{display:flex;align-items:center;justify-content:center;color:#fff;font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;min-width:0;transition:width .25s}
+  .leg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .leg .it{display:flex;align-items:center;gap:8px;font-size:13px;background:#fafbff;border:1px solid var(--linha);border-radius:10px;padding:10px 12px}
+  .leg .dot{width:11px;height:11px;border-radius:3px;flex:none}
+  .leg .it b{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:800}
+  .leg .it small{color:var(--cinza);font-weight:600;margin-left:5px}
+  .ref{margin-top:18px;font-size:12px;color:var(--cinza);line-height:1.7} .ref b{color:var(--tinta)}
+
+  /* benchmarks */
+  .bpanel{background:#fff;border:1px solid var(--linha);border-radius:0 18px 18px 18px;padding:24px;box-shadow:var(--sombra);margin-bottom:60px}
+  .bhead{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+  .bhead h2{font-size:20px;font-weight:800;letter-spacing:-.01em;margin-right:auto}
+  .bhead select{border:1px solid var(--linha);border-radius:10px;padding:9px 12px;font-size:13.5px;font-weight:700;background:#fafbff;color:var(--tinta);cursor:pointer}
+  .bnote{font-size:12.5px;color:var(--cinza);margin-bottom:16px;line-height:1.6}
+  .bnote b{color:var(--tinta)}
+  .btable-wrap{overflow-x:auto;border:1px solid var(--linha);border-radius:12px}
+  table.bt{border-collapse:collapse;width:100%;min-width:1020px}
+  .bt th,.bt td{padding:11px 13px;font-size:13px;text-align:right;border-bottom:1px solid var(--linha);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .bt th{background:#fafbff;font-size:11px;letter-spacing:.03em;text-transform:uppercase;color:var(--cinza);font-weight:700;position:sticky;top:0}
+  .bt td:first-child,.bt th:first-child{text-align:left}
+  .bt tbody tr:hover{background:#fafbff}
+  .bt tr:last-child td{border-bottom:none}
+  .vtag{display:inline-block;font-weight:800;padding:2px 9px;border-radius:6px;font-size:12px;color:#fff;margin-right:6px}
+  .vtag.CJ{background:var(--roxo)} .vtag.EC{background:var(--azul)} .vtag.EV{background:#0d9488} .vtag.MED{background:#16a34a}
+  .badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em}
+  .badge.real{background:#dcfce7;color:#15803d} .badge.parcial{background:#fef3c7;color:#92600a} .badge.pendente{background:#f1f2f7;color:#5b6580}
+  .badge.normal{background:#0e1430;color:#fff} .badge.vit{background:#eef2ff;color:#1f47d6}
+  .usebtn{border:1px solid var(--azul);background:var(--azul);color:#fff;border-radius:8px;padding:7px 13px;font-size:12.5px;font-weight:700;cursor:pointer;transition:.15s}
+  .usebtn:hover{background:var(--azul-esc)}
+  .usebtn:disabled{background:#eef1f8;border-color:var(--linha);color:#a7b0c6;cursor:not-allowed}
+  .muted{color:#b3bacb}
+
+  /* benchmark cards grouped by vertente */
+  .vgroup{margin-bottom:14px;border:1px solid var(--linha);border-radius:14px;overflow:hidden;background:#fafbff}
+  .vgroup-head{display:flex;align-items:center;gap:11px;padding:15px 18px;cursor:pointer;user-select:none;background:#fff;transition:.12s}
+  .vgroup-head:hover{background:#f7f9ff}
+  .chev{font-size:13px;color:var(--cinza);transition:transform .18s;flex:none;width:14px}
+  .vgroup:not(.collapsed) .chev{transform:rotate(90deg)}
+  .vgroup.collapsed .bcards{display:none}
+  .vgroup-head .vtag{font-size:14px;padding:4px 12px}
+  .vgroup-head h3{font-size:17px;font-weight:800;letter-spacing:-.01em}
+  .vgroup-head .sub{font-size:12px;color:var(--cinza);margin-left:auto;text-align:right}
+  .bcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:16px;padding:16px 16px 18px}
+  .btoolbar{display:flex;gap:8px;margin-bottom:14px}
+  .btoolbar button{border:1px solid var(--linha);background:#fff;border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;color:var(--tinta)}
+  .btoolbar button:hover{border-color:var(--azul);color:var(--azul)}
+  .bcard{border:1px solid var(--linha);border-radius:16px;padding:18px;background:#fff;box-shadow:var(--sombra);display:flex;flex-direction:column}
+  .bcard .top{display:flex;align-items:center;gap:9px;margin-bottom:12px}
+  .bcard .yr{font-size:21px;font-weight:800}
+  .bcard .row{display:flex;justify-content:space-between;font-size:13px;padding:2px 0}
+  .bcard .row span{color:var(--cinza)} .bcard .row b{font-variant-numeric:tabular-nums;font-weight:700}
+  .bcard .pen{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+  .penbar{height:8px;background:#eef1f8;border-radius:99px;overflow:hidden;margin:4px 0 3px}
+  .penbar i{display:block;height:100%;background:linear-gradient(90deg,#4f6ff0,var(--azul));border-radius:99px}
+  .miniseg{display:flex;height:24px;border-radius:7px;overflow:hidden;margin:11px 0 6px}
+  .miniseg span{min-width:0}
+  .segleg{display:flex;justify-content:space-between;font-size:11px;color:var(--cinza);font-weight:600}
+  .metrics{display:grid;grid-template-columns:1fr 1fr;gap:5px 14px;font-size:12.5px;margin:13px 0 15px;padding-top:12px;border-top:1px solid var(--linha)}
+  .metrics div{display:flex;justify-content:space-between} .metrics span{color:var(--cinza)} .metrics b{font-variant-numeric:tabular-nums;font-weight:700}
+  .bcard .usebtn{width:100%;margin-top:auto;padding:10px}
+  .alunobox{margin:13px 0 2px;padding-top:12px;border-top:1px solid var(--linha)}
+  .alunobox .hd{font-size:11px;color:var(--cinza);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px}
+  .alunobar{display:flex;height:22px;border-radius:7px;overflow:hidden;margin-bottom:7px}
+  .alunobar span{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;min-width:0}
+  .alunolegs{display:flex;justify-content:space-between;font-size:12px}
+  .alunolegs b{font-variant-numeric:tabular-nums}
+
+  @media(max-width:920px){.grid{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr}.leg{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Modelo derivado dos lançamentos EC · CJ · EV</div>
+    <h1>Calculadora — Lançamento Vitalício</h1>
+    <p>Total de vendas = base própria (penetração × base ativa) + complementar (cross-sell) + não-alunos. Consulte a aba <b>Benchmarks</b> para calibrar com dados reais e clique <b>usar</b> para carregar na calculadora.</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="tabbar">
+    <button class="tab active" id="tabCalc" onclick="showTab(&#39;calc&#39;)">🧮 Calculadora</button>
+    <button class="tab" id="tabBench" onclick="showTab(&#39;bench&#39;)">📚 Benchmarks (base de conhecimento)</button>
+  </div>
+
+  <!-- ================= CALCULADORA ================= -->
+  <div class="tabpane show" id="paneCalc">
+    <div class="presets">
+      <b>Presets:</b>
+      <button class="pbtn" onclick="preset(&#39;ec&#39;)">Cenário EC (autossuficiente)</button>
+      <button class="pbtn cj" onclick="preset(&#39;cj&#39;)">Cenário CJ (puxa Concursos)</button>
+      <button class="pbtn" onclick="preset(&#39;med&#39;)">Reset MED</button>
+    </div>
+
+    <div class="grid">
+      <div class="panel">
+        <h2>Premissas</h2>
+        <div class="field">
+          <label>Base ativa da vertente <span class="v" id="vBase">25.877</span></label>
+          <input type="number" id="base" value="25877" step="100">
+          <div class="sub">Alunos ativos no mês anterior ao lançamento (Metabase). EMED ≈ 26.700.</div>
+        </div>
+        <div class="field">
+          <label>Penetração da base própria <span class="v" id="vPen">6,5%</span></label>
+          <input type="range" id="pen" min="0" max="15" value="6.5" step="0.05">
+          <div class="sub">Compradores da própria vertente ÷ base ativa. Real: <b>EC 6,4–8,7%</b> · <b>CJ 6,7–9,2%</b>. → base própria: <b id="vPropria">1.682</b> vendas</div>
+        </div>
+        <div class="field">
+          <label>Complementar / cross-sell (vendas) <span class="hint">Concursos p/ CJ e MED</span></label>
+          <input type="number" id="conc" value="0" step="100">
+          <div class="sub">Compradores vindos de outra vertente. CJ puxa Concursos ~2.700; EC ~0.</div>
+        </div>
+        <div class="field">
+          <label>Não-alunos / novos (vendas)</label>
+          <input type="number" id="novos" value="5000" step="100">
+          <div class="sub">Compradores que ainda não eram alunos. CJ ~1.700 · EC ~900.</div>
+        </div>
+        <div class="field">
+          <label>Ticket médio (R$)</label>
+          <input type="number" id="ticket" value="12000" step="500">
+          <div class="sub">MED = R$ 10.000. Reais: CJ ~R$ 4.600 · EC ~R$ 3.300.</div>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label>Custo por venda (R$) <span class="v" id="vCusto">R$ 1.200</span></label>
+          <input type="range" id="custo" min="100" max="1500" value="1200" step="25">
+          <div class="sub">Investimento de mídia ÷ vendas. Real: ~R$ 175 (enxuto) a ~R$ 492 (escalado).</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="out-top">
+          <div class="big"><div class="lab">Total de vendas</div><div class="num" id="oVendas">6.682</div><div class="sub">própria + complementar + novos</div></div>
+          <div class="big fat"><div class="lab">Faturamento</div><div class="num" id="oFat">R$ 80,2 MM</div><div class="sub" id="oFatSub">ticket R$ 12.000</div></div>
+        </div>
+        <div class="kpis">
+          <div class="kpi"><div class="l">Investimento mídia</div><div class="n" id="oInv">R$ 8,0 MM</div></div>
+          <div class="kpi"><div class="l">ROAS</div><div class="n" id="oRoas">10,0</div></div>
+          <div class="kpi"><div class="l">% da receita</div><div class="n" id="oPct">10,0%</div></div>
+          <div class="kpi"><div class="l">Lucro (receita − mídia)</div><div class="n green" id="oLucro">R$ 72,2 MM</div></div>
+        </div>
+        <div class="compbox">
+          <h3>Composição das vendas</h3>
+          <div class="seg" id="seg"><span style="width:25.172104160431008%;background:#7c3aed">Própria · 1.682</span><span style="width:0%;background:#b07ef0"></span><span style="width:74.827895839569%;background:#f5a524;color:#3a2a00">Novos · 5.000</span></div>
+          <div class="leg">
+            <div class="it"><span class="dot" style="background:#7c3aed"></span>Base própria <b id="lPropria">1.682 <small>25,2%</small></b></div>
+            <div class="it"><span class="dot" style="background:#b07ef0"></span>Complementar <b id="lConc">0 <small>0,0%</small></b></div>
+            <div class="it"><span class="dot" style="background:#f5a524"></span>Não-alunos <b id="lNovos">5.000 <small>74,8%</small></b></div>
+          </div>
+          <div class="ref"><b>Captação:</b> <span id="oLeads">~33.410</span> leads necessários · CPL <span id="oCpl">~R$ 240</span>.<br>Consulte a aba <b>Benchmarks</b> para os números reais de cada vertente/ano.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= BENCHMARKS ================= -->
+  <div class="tabpane" id="paneBench">
+    <div class="bpanel">
+      <div class="bhead">
+        <h2>📚 Base de conhecimento — benchmarks reais</h2>
+        <label style="font-size:12.5px;color:var(--cinza);font-weight:600">Tipo
+          <select id="fTipo" onchange="renderBench()"><option value="">Todos</option><option>Vitalícia</option><option>Normal</option></select>
+        </label>
+        <label style="font-size:12.5px;color:var(--cinza);font-weight:600">Vertente
+          <select id="fVert" onchange="renderBench()"><option value="">Todas</option><option>EC</option><option>CJ</option><option>MED</option><option>EV</option></select>
+        </label>
+        <label style="font-size:12.5px;color:var(--cinza);font-weight:600">Ano
+          <select id="fAno" onchange="renderBench()"><option value="">Todos</option><option>2019</option><option>2021</option><option>2023</option><option>2025</option><option>2026</option></select>
+        </label>
+      </div>
+      <div class="bnote">Dados <b>reais</b> dos lançamentos (Metabase + painéis Alunos × Não-alunos). Clique <b>usar</b> para carregar a linha na calculadora — depois ajuste o <b>ticket</b> para o produto que está simulando (ex.: MED = R$ 10k). Campos <b class="muted">—</b> estão pendentes; me passe os painéis para completar. Penetração = própria ÷ base ativa do mês anterior. <b>Regra:</b> múltiplas verticais entram na <b>própria</b> (em CJ, própria = jurídica + múltiplas); o Concursos é só <b>complementar</b> e não entra na penetração.</div>
+      <div class="btoolbar">
+        <button onclick="setAll(false)">▾ Expandir todas</button>
+        <button onclick="setAll(true)">▸ Recolher todas</button>
+      </div>
+      <div id="benchGroups"><div class="vgroup "><div class="vgroup-head" onclick="toggleGroup(&#39;CJ&#39;)"><span class="chev">▸</span><span class="vtag CJ">CJ</span><h3>Estratégia CJ — Jurídica</h3><span class="sub">3 Vitalícias · 3 normalis · pen. 1,3%–10,4% · base ECJ</span></div><div class="bcards"><div class="bcard">
+          <div class="top"><span class="yr">2021</span><span class="badge vit">Vitalícia</span><span class="badge real">real</span></div>
+          <div class="row"><span>Base ativa (mês ant.)</span><b>20.678</b></div>
+          <div style="margin:9px 0 2px"><div class="pen">10,4%</div><div class="penbar"><i style="width:86.25%"></i></div><div style="font-size:11px;color:var(--cinza)">penetração da base própria</div></div>
+          <div class="miniseg">
+      <span style="width:34.322373696872496%;background:#7c3aed"></span>
+      <span style="width:42.502004811547714%;background:#b07ef0"></span>
+      <span style="width:23.175621491579793%;background:#f5a524"></span></div>
+      <div class="segleg"><span style="color:#7c3aed">■ 2.140 própria <small style="color:#b3bacb">+múlt</small></span><span style="color:#b07ef0">■ 2.650 compl</span><span style="color:#d18a12">■ 1.445 novos</span></div>
+          <div class="alunobox"><div class="hd">Aluno × Não-aluno</div>
+      <div class="alunobar"><span style="width:76.82437850842021%;background:#1f47d6">76,8%</span><span style="width:23.175621491579793%;background:#f5a524;color:#3a2a00">23,2%</span></div>
+      <div class="alunolegs"><span style="color:#1f47d6">■ Alunos da base <b>4.790</b></span><span style="color:#d18a12">■ Não-alunos <b>1.445</b></span></div>
+    </div>
+          <div class="metrics">
+            <div><span>Investimento</span><b>—</b></div>
+            <div><span>ROAS</span><b>—</b></div>
+            <div><span>Vendas</span><b>6.246</b></div>
+            <div><span>Ticket</span><b>R$ 2.384</b></div>
+            <div><span>Custo/venda</span><b>—</b></div>
+            <div><span>CPL</span><b>—</b></div>
+          </div>
+          <button class="usebtn" onclick="useBench(0)">usar na calculadora ▶</button>
+        </div><div class="bcard">
+          <div class="top"><span class="yr">2023</span><span class="badge vit">Vitalícia</span><span class="badge real">real</span></div>
+          <div class="row"><span>Base ativa (mês ant.)</span><b>23.996</b></div>
+          <div style="margin:9px 0 2px"><div class="pen">6,7%</div><div class="penbar"><i style="width:55.833333333333336%"></i></div><div style="font-size:11px;color:var(--cinza)">penetração da base própria</div></div>
+          <div class="miniseg">
+      <span style="width:25.346784363177804%;background:#7c3aed"></span>
+      <span style="width:41.55107187894073%;background:#b07ef0"></span>
+      <span style="width:33.102143757881464%;background:#f5a524"></span></div>
+      <div class="segleg"><span style="color:#7c3aed">■ 1.608 própria <small style="color:#b3bacb">+múlt</small></span><span style="color:#b07ef0">■ 2.636 compl</span><span style="color:#d18a12">■ 2.100 novos</span></div>
+          <div class="alunobox"><div class="hd">Aluno × Não-aluno</div>
+      <div class="alunobar"><span style="width:66.89785624211854%;background:#1f47d6">66,9%</span><span style="width:33.102143757881464%;background:#f5a524;color:#3a2a00">33,1%</span></div>
+      <div class="alunolegs"><span style="color:#1f47d6">■ Alunos da base <b>4.244</b></span><span style="color:#d18a12">■ Não-alunos <b>2.100</b></span></div>
+    </div>
+          <div class="metrics">
+            <div><span>Investimento</span><b>R$ 1,2 MM</b></div>
+            <div><span>ROAS</span><b>19,2</b></div>
+            <div><span>Vendas</span><b>6.344</b></div>
+            <div><span>Ticket</span><b>R$ 3.644</b></div>
+            <div><span>Custo/venda</span><b>R$ 281</b></div>
+            <div><span>CPL</span><b>R$ 40</b></div>
+          </div>
+          <button class="usebtn" onclick="useBench(1)">usar na calculadora ▶</button>
+        </div><div class="bcard">
+          <div class="top"><span class="yr">2025</span><span class="badge vit">Vitalícia</span><span class="badge real">real</span></div>
+          <div class="row"><span>Base ativa (mês ant.)</span><b>26.748</b></div>
+          <div style="margin:9px 0 2px"><div class="pen">9,3%</div><div class="penbar"><i style="width:77.08333333333334%"></i></div><div style="font-size:11px;color:var(--cinza)">penetração da base própria</div></div>
+          <div class="miniseg">
+      <span style="width:37.467817658640016%;background:#7c3aed"></span>
+      <span style="width:41.79918218991367%;background:#b07ef0"></span>
+      <span style="width:20.733000151446312%;background:#f5a524"></span></div>
+      <div class="segleg"><span style="color:#7c3aed">■ 2.474 própria <small style="color:#b3bacb">+múlt</small></span><span style="color:#b07ef0">■ 2.760 compl</span><span style="color:#d18a12">■ 1.369 novos</span></div>
+          <div class="alunobox"><div class="hd">Aluno × Não-aluno</div>
+      <div class="alunobar"><span style="width:79.26699984855368%;background:#1f47d6">79,3%</span><span style="width:20.733000151446312%;background:#f5a524;color:#3a2a00">20,7%</span></div>
+      <div class="alunolegs"><span style="color:#1f47d6">■ Alunos da base <b>5.234</b></span><span style="color:#d18a12">■ Não-alunos <b>1.369</b></span></div>
+    </div>
+          <div class="metrics">
+            <div><span>Investimento</span><b>R$ 3,1 MM</b></div>
+            <div><span>ROAS</span><b>10,4</b></div>
+            <div><span>Vendas</span><b>6.603</b></div>
+            <div><span>Ticket</span><b>R$ 4.644</b></div>
+            <div><span>Custo/venda</span><b>R$ 458</b></div>
+            <div><span>CPL</span><b>R$ 24</b></div>
+          </div>
+          <button class="usebtn" onclick="useBench(2)">usar na calculadora ▶</button>
+        </div><div class="bcard">
+          <div class="top"><span class="yr">2025</span><span class="badge normal">Janeiro</span><span class="badge real">real</span></div>
+          <div class="row"><span>Base ativa (mês ant.)</span><b>26.571</b></div>
+          <div style="margin:9px 0 2px"><div class="pen">1,5%</div><div class="penbar"><i style="width:12.25%"></i></div><div style="font-size:11px;color:var(--cinza)">penetração da base própria</div></div>
+          <div class="miniseg">
+      <span style="width:21.021505376344084%;background:#7c3aed"></span>
+      <span style="width:29.08602150537634%;background:#b07ef0"></span>
+      <span style="width:49.89247311827957%;background:#f5a524"></span></div>
+      <div class="segleg"><span style="color:#7c3aed">■ 391 própria <small style="color:#b3bacb">+múlt</small></span><span style="color:#b07ef0">■ 541 compl</span><span style="color:#d18a12">■ 928 novos</span></div>
+          <div class="alunobox"><div class="hd">Aluno × Não-aluno</div>
+      <div class="alunobar"><span style="width:50.10752688172043%;background:#1f47d6">50,1%</span><span style="width:49.89247311827957%;background:#f5a524;color:#3a2a00">49,9%</span></div>
+      <div class="alunolegs"><span style="color:#1f47d6">■ Alunos da base <b>932</b></span><span style="color:#d18a12">■ Não-alunos <b>928</b></span></div>
+    </div>
+          <div class="metrics">
+            <div><span>Investimento</span><b>—</b></div>
+            <div><span>ROAS</span><b>—</b></div>
+            <div><span>Vendas</span><b>1.869</b></div>
+            <div><span>Ticket</span><b>R$ 2.365</b></div>
+            <div><span>Custo/venda</span><b>—</b></div>
+            <div><span>CPL</span><b>—</b></div>
+          </div>
+          <button class="usebtn" onclick="useBench(3)">usar na calculadora ▶</button>
+        </div><div class="bcard">
+          <div class="top"><span class="yr">2025</span><span class="badge normal">Black Friday</span><span class="badge real">real</span></div>
+          <div class="row"><span>Base ativa (mês ant.)</span><b>30.894</b></div>
+          <div style="margin:9px 0 2px"><div class="pen">1,5%</div><div class="penbar"><i style="width:12.333333333333334%"></i></div><div style="font-size:11px;color:var(--cinza)">penetração da base própria</div></div>
+          <div class="miniseg">
+      <span style="width:24.143384290985768%;background:#7c3aed"></span>
+      <span style="width:28.887717448603055%;background:#b07ef0"></span>
+      <span style="width:46.96889826041117%;background:#f5a524"></span></div>
+      <div class="segleg"><span style="color:#7c3aed">■ 458 própria <small style="color:#b3bacb">+múlt</small></span><span style="color:#b07ef0">■ 548 compl</span><span style="color:#d18a12">■ 891 novos</span></div>
+          <div class="alunobox"><div class="hd">Aluno × Não-aluno</div>
+      <div class="alunobar"><span style="width:53.03110173958883%;background:#1f47d6">53,0%</span><span style="width:46.96889826041117%;background:#f5a524;color:#3a2a00">47,0%</span></div>
+      <div class="alunolegs"><span style="color:#1f47d6">■ Alunos da base <b>1.006</b></span><span style="color:#d18a12">■ Não-alunos <b>891</b></span></div>
+    </div>
+          <div class="metrics">
+            <div><span>Investimento</span><b>—</b></div>
+            <div><span>ROAS</span><b>—</b></div>
+            <div><span>Vendas</span><b>1.905</b></div>
+            <div><span>Ticket</span><b>R$ 2.547</b></div>
+            <div><span>Custo/venda</span><b>—</b></div>
+            <div><span>CPL</span><b>—</b></div>
+          </div>
+          <button class="usebtn" onclick="useBench(4)">usar na calculadora ▶</button>
+        </div><div class="bcard">
+          <div class="top"><span class="yr">2026</span><span class="badge normal">Janeiro</span><span class="badge real">real</span></div>
+          <div class="row"><span>Base ativa (mês ant.)</span><b>30.826</b></div>
+          <div style="margin:9px 0 2px"><div class="pen">1,3%</div><div class="penbar"><i style="width:10.416666666666668%"></i></div><div style="font-size:11px;color:var(--cinza)">penetração da base própria</div></div>
+          <div class="miniseg">
+      <span style="width:24.584929757343552%;background:#7c3aed"></span>
+      <span style="width:28.735632183908045%;background:#b07ef0"></span>
+      <span style="width:46.6794380587484%;background:#f5a524"></span></div>
+      <div class="segleg"><span style="color:#7c3aed">■ 385 própria <small style="color:#b3bacb">+múlt</small></span><span style="color:#b07ef0">■ 450 compl</span><span style="color:#d18a12">■ 731 novos</span></div>
+          <div class="alunobox"><div class="hd">Aluno × Não-aluno</div>
+      <div class="alunobar"><span style="width:53.3205619412516%;background:#1f47d6">53,3%</span><span style="width:46.6794380587484%;background:#f5a524;color:#3a2a00">46,7%</span></div>
+      <div class="alunolegs"><span style="color:#1f47d6">■ Alunos da base <b>835</b></span><span style="color:#d18a12">■ Não-alunos <b>731</b></span></div>
+    </div>
+          <div class="metrics">
+            <div><span>Investimento</span><b>—</b></div>
+            <div><span>ROAS</span><b>—</b></div>
+            <div><span>Vendas</span><b>1.569</b></div>
+            <div><span>Ticket</span><b>R$ 2.692</b></div>
+            <div><span>Custo/venda</span><b>—</b></div>
+            <div><span>CPL</span><b>—</b></div>
+          </div>
+          <button class="usebtn" onclick="useBench(5)">usar na calculadora ▶</button>
+        </div></div></div><div class="vgroup collapsed"><div class="vgroup-head" onclick="toggleGroup(&#39;EC&#39;)"><span class="chev">▸</span><span class="vtag EC">EC</span><h3>Estratégia EC — Concursos</h3><span class="sub">3 Vitalícias · 3 normalis · pen. 5,5%–8,7% · base Concursos</span></div><div class="bcards"><div class="bcard">
+          <div class="top"><span class="yr">2019</span><span class="badge vit">Vitalícia</span><span class="badge parcial">parcial</span></div>
+          <div class="row"><span>Base ativa (mês ant.)</span><b>247.102</b></div>
+          <div style="margin:9px 0 2px"><div class="pen">5,8%</div><div class="penbar"><i style="width:48.25%"></i></div><div style="font-size:11px;color:var(--cinza)">penetração da base própria</div></div>
+          <div class="miniseg">
+      <span style="width:82.41226300927794%;background:#7c3aed"></span>
+      <span style="width:0%;background:#b07ef0"></span>
+      <span style="width:17.587736990722068%;background:#f5a524"></span></div>
+      <div class="segleg"><span style="color:#7c3aed">■ 14.301 própria <small style="color:#b3bacb">+múlt</small></span><span style="color:#b07ef0">■ 0 compl</span><span style="color:#d18a12">■ 3.052 novos</span></div>
+          <div class="alunobox"><div class="hd">Aluno × Não-aluno</div>
+      <div class="alunobar"><span style="width:82.41226300927794%;background:#1f47d6">82,4%</span><span style="width:17.587736990722068%;background:#f5a524;color:#3a2a00">17,6%</span></div>
+      <div class="alunolegs"><span style="color:#1f47d6">■ Alunos da base <b>14.301</b></span><span style="color:#d18a12">■ Não-alunos <b>3.052</b></span></div>
+    </div>
+          <div class="metrics">
+            <div><span>Investimento</span><b>—</b></div>
+            <div><span>ROAS</span><b>—</b></div>
+            <div><span>Vendas</span><b>17.353</b></div>
+            <div><span>Ticket</span><b>R$ 2.664</b></div>
+            <div><span>Custo/venda</span><b>—</b></div>
+            <div><span>CPL</span><b>—</b></div>
+          </div>
+          <button class="usebtn" onclick="useBench(6)">usar na calculadora ▶</button>
+        </div><div class="bcard">
+          <div class="top"><span class="yr">2023</span><span class="badge vit">Vitalícia</span><span class="badge real">real</span></div>
+          <div class="row"><span>Base ativa (mês ant.)</span><b>328.005</b></div>
+          <div style="margin:9px 0 2px"><div class="pen">8,7%</div><div class="penbar"><i style="width:72.41666666666666%"></i></div><div style="font-size:11px;color:var(--cinza)">penetração da base própria</div></div>
+          <div class="miniseg">
+      <span style="width:75.40454785827605%;background:#7c3aed"></span>
+      <span style="width:0.8593336858804865%;background:#b07ef0"></span>
+      <span style="width:23.736118455843467%;background:#f5a524"></span></div>
+      <div class="segleg"><span style="color:#7c3aed">■ 28.518 própria <small style="color:#b3bacb">+múlt</small></span><span style="color:#b07ef0">■ 325 compl</span><span style="color:#d18a12">■ 8.977 novos</span></div>
+          <div class="alunobox"><div class="hd">Aluno × Não-aluno</div>
+      <div class="alunobar"><span style="width:76.26388154415653%;background:#1f47d6">76,3%</span><span style="width:23.736118455843467%;background:#f5a524;color:#3a2a00">23,7%</span></div>
+      <div class="alunolegs"><span style="color:#1f47d6">■ Alunos da base <b>28.843</b></span><span style="color:#d18a12">■ Não-alunos <b>8.977</b></span></div>
+    </div>
+          <div class="metrics">
+            <div><span>Investimento</span><b>R$ 6,6 MM</b></div>
+            <div><span>ROAS</span><b>18,0</b></div>
+            <div><span>Vendas</span><b>37.820</b></div>
+            <div><span>Ticket</span><b>R$ 2.872</b></div>
+            <div><span>Custo/venda</span><b>R$ 175</b></div>
+            <div><span>CPL</span><b>R$ 17</b></div>
+          </div>
+          <button class="usebtn" onclick="useBench(7)">usar na calculadora ▶</button>
+        </div><div class="bcard">
+          <div class="top"><span class="yr">2025</span><span class="badge vit">Vitalícia</span><span class="badge real">real</span></div>
+          <div class="row"><span>Base ativa (mês ant.)</span><b>338.793</b></div>
+          <div style="margin:9px 0 2px"><div class="pen">6,4%</div><div class="penbar"><i style="width:53.333333333333336%"></i></div><div style="font-size:11px;color:var(--cinza)">penetração da base própria</div></div>
+          <div class="miniseg">
+      <span style="width:68.63080529683837%;background:#7c3aed"></span>
+      <span style="width:0.535386174998416%;background:#b07ef0"></span>
+      <span style="width:30.833808528163214%;background:#f5a524"></span></div>
+      <div class="segleg"><span style="color:#7c3aed">■ 21.664 própria <small style="color:#b3bacb">+múlt</small></span><span style="color:#b07ef0">■ 169 compl</span><span style="color:#d18a12">■ 9.733 novos</span></div>
+          <div class="alunobox"><div class="hd">Aluno × Não-aluno</div>
+      <div class="alunobar"><span style="width:69.1661914718368%;background:#1f47d6">69,2%</span><span style="width:30.833808528163214%;background:#f5a524;color:#3a2a00">30,8%</span></div>
+      <div class="alunolegs"><span style="color:#1f47d6">■ Alunos da base <b>21.833</b></span><span style="color:#d18a12">■ Não-alunos <b>9.733</b></span></div>
+    </div>
+          <div class="metrics">
+            <div><span>Investimento</span><b>R$ 15,5 MM</b></div>
+            <div><span>ROAS</span><b>7,5</b></div>
+            <div><span>Vendas</span><b>31.566</b></div>
+            <div><span>Ticket</span><b>R$ 3.349</b></div>
+            <div><span>Custo/venda</span><b>R$ 492</b></div>
+            <div><span>CPL</span><b>R$ 9</b></div>
+          </div>
+          <button class="usebtn" onclick="useBench(8)">usar na calculadora ▶</button>
+        </div><div class="bcard">
+          <div class="top"><span class="yr">2025</span><span class="badge normal">Janeiro</span><span class="badge real">real</span></div>
+          <div class="row"><span>Base ativa (mês ant.)</span><b>362.852</b></div>
+          <div style="margin:9px 0 2px"><div class="pen">6,5%</div><div class="penbar"><i style="width:54.41666666666667%"></i></div><div style="font-size:11px;color:var(--cinza)">penetração da base própria</div></div>
+          <div class="miniseg">
+      <span style="width:51.80436017300887%;background:#7c3aed"></span>
+      <span style="width:0%;background:#b07ef0"></span>
+      <span style="width:48.19563982699113%;background:#f5a524"></span></div>
+      <div class="segleg"><span style="color:#7c3aed">■ 23.715 própria <small style="color:#b3bacb">+múlt</small></span><span style="color:#b07ef0">■ 0 compl</span><span style="color:#d18a12">■ 22.063 novos</span></div>
+          <div class="alunobox"><div class="hd">Aluno × Não-aluno</div>
+      <div class="alunobar"><span style="width:51.80436017300887%;background:#1f47d6">51,8%</span><span style="width:48.19563982699113%;background:#f5a524;color:#3a2a00">48,2%</span></div>
+      <div class="alunolegs"><span style="color:#1f47d6">■ Alunos da base <b>23.715</b></span><span style="color:#d18a12">■ Não-alunos <b>22.063</b></span></div>
+    </div>
+          <div class="metrics">
+            <div><span>Investimento</span><b>—</b></div>
+            <div><span>ROAS</span><b>—</b></div>
+            <div><span>Vendas</span><b>46.442</b></div>
+            <div><span>Ticket</span><b>R$ 986</b></div>
+            <div><span>Custo/venda</span><b>—</b></div>
+            <div><span>CPL</span><b>—</b></div>
+          </div>
+          <button class="usebtn" onclick="useBench(9)">usar na calculadora ▶</button>
+        </div><div class="bcard">
+          <div class="top"><span class="yr">2025</span><span class="badge normal">Black Friday</span><span class="badge real">real</span></div>
+          <div class="row"><span>Base ativa (mês ant.)</span><b>360.986</b></div>
+          <div style="margin:9px 0 2px"><div class="pen">7,0%</div><div class="penbar"><i style="width:58.166666666666664%"></i></div><div style="font-size:11px;color:var(--cinza)">penetração da base própria</div></div>
+          <div class="miniseg">
+      <span style="width:52.125987508789336%;background:#7c3aed"></span>
+      <span style="width:0.23989742317078216%;background:#b07ef0"></span>
+      <span style="width:47.634115068039875%;background:#f5a524"></span></div>
+      <div class="segleg"><span style="color:#7c3aed">■ 25.205 própria <small style="color:#b3bacb">+múlt</small></span><span style="color:#b07ef0">■ 116 compl</span><span style="color:#d18a12">■ 23.033 novos</span></div>
+          <div class="alunobox"><div class="hd">Aluno × Não-aluno</div>
+      <div class="alunobar"><span style="width:52.365884931960125%;background:#1f47d6">52,4%</span><span style="width:47.634115068039875%;background:#f5a524;color:#3a2a00">47,6%</span></div>
+      <div class="alunolegs"><span style="color:#1f47d6">■ Alunos da base <b>25.321</b></span><span style="color:#d18a12">■ Não-alunos <b>23.033</b></span></div>
+    </div>
+          <div class="metrics">
+            <div><span>Investimento</span><b>—</b></div>
+            <div><span>ROAS</span><b>—</b></div>
+            <div><span>Vendas</span><b>49.108</b></div>
+            <div><span>Ticket</span><b>R$ 1.011</b></div>
+            <div><span>Custo/venda</span><b>—</b></div>
+            <div><span>CPL</span><b>—</b></div>
+          </div>
+          <button class="usebtn" onclick="useBench(10)">usar na calculadora ▶</button>
+        </div><div class="bcard">
+          <div class="top"><span class="yr">2026</span><span class="badge normal">Janeiro</span><span class="badge real">real</span></div>
+          <div class="row"><span>Base ativa (mês ant.)</span><b>387.511</b></div>
+          <div style="margin:9px 0 2px"><div class="pen">5,5%</div><div class="penbar"><i style="width:45.58333333333333%"></i></div><div style="font-size:11px;color:var(--cinza)">penetração da base própria</div></div>
+          <div class="miniseg">
+      <span style="width:51.21768543126359%;background:#7c3aed"></span>
+      <span style="width:0.2657646774583233%;background:#b07ef0"></span>
+      <span style="width:48.51654989127809%;background:#f5a524"></span></div>
+      <div class="segleg"><span style="color:#7c3aed">■ 21.199 própria <small style="color:#b3bacb">+múlt</small></span><span style="color:#b07ef0">■ 110 compl</span><span style="color:#d18a12">■ 20.081 novos</span></div>
+          <div class="alunobox"><div class="hd">Aluno × Não-aluno</div>
+      <div class="alunobar"><span style="width:51.48345010872192%;background:#1f47d6">51,5%</span><span style="width:48.51654989127809%;background:#f5a524;color:#3a2a00">48,5%</span></div>
+      <div class="alunolegs"><span style="color:#1f47d6">■ Alunos da base <b>21.309</b></span><span style="color:#d18a12">■ Não-alunos <b>20.081</b></span></div>
+    </div>
+          <div class="metrics">
+            <div><span>Investimento</span><b>—</b></div>
+            <div><span>ROAS</span><b>—</b></div>
+            <div><span>Vendas</span><b>41.824</b></div>
+            <div><span>Ticket</span><b>R$ 989</b></div>
+            <div><span>Custo/venda</span><b>—</b></div>
+            <div><span>CPL</span><b>—</b></div>
+          </div>
+          <button class="usebtn" onclick="useBench(11)">usar na calculadora ▶</button>
+        </div></div></div><div class="vgroup collapsed"><div class="vgroup-head" onclick="toggleGroup(&#39;MED&#39;)"><span class="chev">▸</span><span class="vtag MED">MED</span><h3>Estratégia MED — Medicina</h3><span class="sub">3 normalis · pen. 5,0%–7,0% · base EMED</span></div><div class="bcards"><div class="bcard">
+          <div class="top"><span class="yr">2025</span><span class="badge normal">Janeiro</span><span class="badge real">real</span></div>
+          <div class="row"><span>Base ativa (mês ant.)</span><b>21.620</b></div>
+          <div style="margin:9px 0 2px"><div class="pen">6,7%</div><div class="penbar"><i style="width:55.50000000000001%"></i></div><div style="font-size:11px;color:var(--cinza)">penetração da base própria</div></div>
+          <div class="miniseg">
+      <span style="width:22.929936305732486%;background:#7c3aed"></span>
+      <span style="width:0%;background:#b07ef0"></span>
+      <span style="width:77.07006369426752%;background:#f5a524"></span></div>
+      <div class="segleg"><span style="color:#7c3aed">■ 1.440 própria <small style="color:#b3bacb">+múlt</small></span><span style="color:#b07ef0">■ 0 compl</span><span style="color:#d18a12">■ 4.840 novos</span></div>
+          <div class="alunobox"><div class="hd">Aluno × Não-aluno</div>
+      <div class="alunobar"><span style="width:22.929936305732486%;background:#1f47d6">22,9%</span><span style="width:77.07006369426752%;background:#f5a524;color:#3a2a00">77,1%</span></div>
+      <div class="alunolegs"><span style="color:#1f47d6">■ Alunos da base <b>1.440</b></span><span style="color:#d18a12">■ Não-alunos <b>4.840</b></span></div>
+    </div>
+          <div class="metrics">
+            <div><span>Investimento</span><b>—</b></div>
+            <div><span>ROAS</span><b>—</b></div>
+            <div><span>Vendas</span><b>6.338</b></div>
+            <div><span>Ticket</span><b>R$ 3.447</b></div>
+            <div><span>Custo/venda</span><b>—</b></div>
+            <div><span>CPL</span><b>—</b></div>
+          </div>
+          <button class="usebtn" onclick="useBench(14)">usar na calculadora ▶</button>
+        </div><div class="bcard">
+          <div class="top"><span class="yr">2025</span><span class="badge normal">Black Friday</span><span class="badge real">real</span></div>
+          <div class="row"><span>Base ativa (mês ant.)</span><b>24.956</b></div>
+          <div style="margin:9px 0 2px"><div class="pen">7,0%</div><div class="penbar"><i style="width:58.666666666666664%"></i></div><div style="font-size:11px;color:var(--cinza)">penetração da base própria</div></div>
+          <div class="miniseg">
+      <span style="width:27.240310077519382%;background:#7c3aed"></span>
+      <span style="width:0%;background:#b07ef0"></span>
+      <span style="width:72.75968992248062%;background:#f5a524"></span></div>
+      <div class="segleg"><span style="color:#7c3aed">■ 1.757 própria <small style="color:#b3bacb">+múlt</small></span><span style="color:#b07ef0">■ 0 compl</span><span style="color:#d18a12">■ 4.693 novos</span></div>
+          <div class="alunobox"><div class="hd">Aluno × Não-aluno</div>
+      <div class="alunobar"><span style="width:27.240310077519382%;background:#1f47d6">27,2%</span><span style="width:72.75968992248062%;background:#f5a524;color:#3a2a00">72,8%</span></div>
+      <div class="alunolegs"><span style="color:#1f47d6">■ Alunos da base <b>1.757</b></span><span style="color:#d18a12">■ Não-alunos <b>4.693</b></span></div>
+    </div>
+          <div class="metrics">
+            <div><span>Investimento</span><b>—</b></div>
+            <div><span>ROAS</span><b>—</b></div>
+            <div><span>Vendas</span><b>6.537</b></div>
+            <div><span>Ticket</span><b>R$ 4.029</b></div>
+            <div><span>Custo/venda</span><b>—</b></div>
+            <div><span>CPL</span><b>—</b></div>
+          </div>
+          <button class="usebtn" onclick="useBench(15)">usar na calculadora ▶</button>
+        </div><div class="bcard">
+          <div class="top"><span class="yr">2026</span><span class="badge normal">Janeiro</span><span class="badge real">real</span></div>
+          <div class="row"><span>Base ativa (mês ant.)</span><b>27.573</b></div>
+          <div style="margin:9px 0 2px"><div class="pen">5,0%</div><div class="penbar"><i style="width:41.333333333333336%"></i></div><div style="font-size:11px;color:var(--cinza)">penetração da base própria</div></div>
+          <div class="miniseg">
+      <span style="width:24.578096947935368%;background:#7c3aed"></span>
+      <span style="width:0%;background:#b07ef0"></span>
+      <span style="width:75.42190305206464%;background:#f5a524"></span></div>
+      <div class="segleg"><span style="color:#7c3aed">■ 1.369 própria <small style="color:#b3bacb">+múlt</small></span><span style="color:#b07ef0">■ 0 compl</span><span style="color:#d18a12">■ 4.201 novos</span></div>
+          <div class="alunobox"><div class="hd">Aluno × Não-aluno</div>
+      <div class="alunobar"><span style="width:24.578096947935368%;background:#1f47d6">24,6%</span><span style="width:75.42190305206464%;background:#f5a524;color:#3a2a00">75,4%</span></div>
+      <div class="alunolegs"><span style="color:#1f47d6">■ Alunos da base <b>1.369</b></span><span style="color:#d18a12">■ Não-alunos <b>4.201</b></span></div>
+    </div>
+          <div class="metrics">
+            <div><span>Investimento</span><b>—</b></div>
+            <div><span>ROAS</span><b>—</b></div>
+            <div><span>Vendas</span><b>5.624</b></div>
+            <div><span>Ticket</span><b>R$ 4.888</b></div>
+            <div><span>Custo/venda</span><b>—</b></div>
+            <div><span>CPL</span><b>—</b></div>
+          </div>
+          <button class="usebtn" onclick="useBench(16)">usar na calculadora ▶</button>
+        </div></div></div><div class="vgroup collapsed"><div class="vgroup-head" onclick="toggleGroup(&#39;EV&#39;)"><span class="chev">▸</span><span class="vtag EV">EV</span><h3>Estratégia EV — Vestibulares</h3><span class="sub">1 Vitalícia · 1 normal · pen. 4,1%–5,7% · base EVEST</span></div><div class="bcards"><div class="bcard">
+          <div class="top"><span class="yr">2025</span><span class="badge vit">Vitalícia</span><span class="badge real">real</span></div>
+          <div class="row"><span>Base ativa (mês ant.)</span><b>8.472</b></div>
+          <div style="margin:9px 0 2px"><div class="pen">5,7%</div><div class="penbar"><i style="width:47.5%"></i></div><div style="font-size:11px;color:var(--cinza)">penetração da base própria</div></div>
+          <div class="miniseg">
+      <span style="width:21.147110332749563%;background:#7c3aed"></span>
+      <span style="width:39.185639229422065%;background:#b07ef0"></span>
+      <span style="width:39.66725043782837%;background:#f5a524"></span></div>
+      <div class="segleg"><span style="color:#7c3aed">■ 483 própria <small style="color:#b3bacb">+múlt</small></span><span style="color:#b07ef0">■ 895 compl</span><span style="color:#d18a12">■ 906 novos</span></div>
+          <div class="alunobox"><div class="hd">Aluno × Não-aluno</div>
+      <div class="alunobar"><span style="width:60.33274956217163%;background:#1f47d6">60,3%</span><span style="width:39.66725043782837%;background:#f5a524;color:#3a2a00">39,7%</span></div>
+      <div class="alunolegs"><span style="color:#1f47d6">■ Alunos da base <b>1.378</b></span><span style="color:#d18a12">■ Não-alunos <b>906</b></span></div>
+    </div>
+          <div class="metrics">
+            <div><span>Investimento</span><b>R$ 749 mil</b></div>
+            <div><span>ROAS</span><b>5,9</b></div>
+            <div><span>Vendas</span><b>2.289</b></div>
+            <div><span>Ticket</span><b>R$ 1.913</b></div>
+            <div><span>Custo/venda</span><b>R$ 327</b></div>
+            <div><span>CPL</span><b>—</b></div>
+          </div>
+          <button class="usebtn" onclick="useBench(12)">usar na calculadora ▶</button>
+        </div><div class="bcard">
+          <div class="top"><span class="yr">2025</span><span class="badge normal">Janeiro</span><span class="badge real">real</span></div>
+          <div class="row"><span>Base ativa (mês ant.)</span><b>8.883</b></div>
+          <div style="margin:9px 0 2px"><div class="pen">4,1%</div><div class="penbar"><i style="width:34.166666666666664%"></i></div><div style="font-size:11px;color:var(--cinza)">penetração da base própria</div></div>
+          <div class="miniseg">
+      <span style="width:13.566902720834886%;background:#7c3aed"></span>
+      <span style="width:11.069698099142752%;background:#b07ef0"></span>
+      <span style="width:75.36339918002236%;background:#f5a524"></span></div>
+      <div class="segleg"><span style="color:#7c3aed">■ 364 própria <small style="color:#b3bacb">+múlt</small></span><span style="color:#b07ef0">■ 297 compl</span><span style="color:#d18a12">■ 2.022 novos</span></div>
+          <div class="alunobox"><div class="hd">Aluno × Não-aluno</div>
+      <div class="alunobar"><span style="width:24.636600819977637%;background:#1f47d6">24,6%</span><span style="width:75.36339918002236%;background:#f5a524;color:#3a2a00">75,4%</span></div>
+      <div class="alunolegs"><span style="color:#1f47d6">■ Alunos da base <b>661</b></span><span style="color:#d18a12">■ Não-alunos <b>2.022</b></span></div>
+    </div>
+          <div class="metrics">
+            <div><span>Investimento</span><b>—</b></div>
+            <div><span>ROAS</span><b>—</b></div>
+            <div><span>Vendas</span><b>2.710</b></div>
+            <div><span>Ticket</span><b>R$ 926</b></div>
+            <div><span>Custo/venda</span><b>—</b></div>
+            <div><span>CPL</span><b>—</b></div>
+          </div>
+          <button class="usebtn" onclick="useBench(13)">usar na calculadora ▶</button>
+        </div></div></div></div>
+      <div class="bnote" style="margin-top:14px"><b>Faltando mapear:</b> CJ 2021 (painel de origem), EV 2025 (composição e faturamento), custo/CPL de anos antigos. Manda que eu completo.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const fmtInt = v => (v==null?'—':Math.round(v).toLocaleString('pt-BR'));
+  const fmtMM = v => 'R$ ' + (v/1e6).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1}) + ' MM';
+  const fmtBRL = v => (v==null?'—':'R$ ' + Math.round(v).toLocaleString('pt-BR'));
+  const fmtPct = v => (v==null?'—':v.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1}) + '%');
+  const fmtN1 = v => (v==null?'—':v.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1}));
+  const fmtInvest = v => v==null ? '—' : (v>=1e6 ? 'R$ '+(v/1e6).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+' MM' : 'R$ '+Math.round(v/1e3)+' mil');
+
+  // ---------- knowledge base ----------
+  const BENCH = [
+    {v:'CJ',ano:2021,base:20678,propria:2140,conc:2650,novos:1445,vendas:6246,pen:10.35,ticket:2384,roas:null,custo:null,cpl:null,leadsV:null,st:'real'},
+    {v:'CJ',ano:2023,base:23996,propria:1608,conc:2636,novos:2100,vendas:6344,pen:6.70,ticket:3644,roas:19.16,custo:281,cpl:40.21,leadsV:3.50,invest:1239534,st:'real'},
+    {v:'CJ',ano:2025,base:26748,propria:2474,conc:2760,novos:1369,vendas:6603,pen:9.25,ticket:4644,roas:10.40,custo:458,cpl:23.74,leadsV:3.78,invest:3117883,st:'real'},
+    {v:'CJ',ano:2025,tipo:'Normal',nome:'Janeiro',base:26571,propria:391,conc:541,novos:928,vendas:1869,pen:1.47,ticket:2365,roas:null,custo:null,cpl:null,leadsV:null,st:'real'},
+    {v:'CJ',ano:2025,tipo:'Normal',nome:'Black Friday',base:30894,propria:458,conc:548,novos:891,vendas:1905,pen:1.48,ticket:2547,roas:null,custo:null,cpl:null,leadsV:null,st:'real'},
+    {v:'CJ',ano:2026,tipo:'Normal',nome:'Janeiro',base:30826,propria:385,conc:450,novos:731,vendas:1569,pen:1.25,ticket:2692,roas:null,custo:null,cpl:null,leadsV:null,st:'real'},
+    {v:'EC',ano:2019,base:247102,propria:14301,conc:0,novos:3052,vendas:17353,pen:5.79,ticket:2664,roas:null,custo:null,cpl:null,leadsV:null,st:'parcial'},
+    {v:'EC',ano:2023,base:328005,propria:28518,conc:325,novos:8977,vendas:37820,pen:8.69,ticket:2872,roas:18.01,custo:175,cpl:16.92,leadsV:2.03,invest:6601606,st:'real'},
+    {v:'EC',ano:2025,base:338793,propria:21664,conc:169,novos:9733,vendas:31566,pen:6.40,ticket:3349,roas:7.54,custo:492,cpl:8.82,leadsV:6.69,invest:15522960,st:'real'},
+    {v:'EC',ano:2025,tipo:'Normal',nome:'Janeiro',base:362852,propria:23715,conc:0,novos:22063,vendas:46442,pen:6.53,ticket:986,roas:null,custo:null,cpl:null,leadsV:null,st:'real'},
+    {v:'EC',ano:2025,tipo:'Normal',nome:'Black Friday',base:360986,propria:25205,conc:116,novos:23033,vendas:49108,pen:6.98,ticket:1011,roas:null,custo:null,cpl:null,leadsV:null,st:'real'},
+    {v:'EC',ano:2026,tipo:'Normal',nome:'Janeiro',base:387511,propria:21199,conc:110,novos:20081,vendas:41824,pen:5.47,ticket:989,roas:null,custo:null,cpl:null,leadsV:null,st:'real'},
+    {v:'EV',ano:2025,base:8472,propria:483,conc:895,novos:906,vendas:2289,pen:5.70,ticket:1913,roas:5.85,custo:327,cpl:null,leadsV:null,invest:748581,st:'real'},
+    {v:'EV',ano:2025,tipo:'Normal',nome:'Janeiro',base:8883,propria:364,conc:297,novos:2022,vendas:2710,pen:4.10,ticket:926,roas:null,custo:null,cpl:null,leadsV:null,st:'real'},
+    {v:'MED',ano:2025,tipo:'Normal',nome:'Janeiro',base:21620,propria:1440,conc:0,novos:4840,vendas:6338,pen:6.66,ticket:3447,roas:null,custo:null,cpl:null,leadsV:null,st:'real'},
+    {v:'MED',ano:2025,tipo:'Normal',nome:'Black Friday',base:24956,propria:1757,conc:0,novos:4693,vendas:6537,pen:7.04,ticket:4029,roas:null,custo:null,cpl:null,leadsV:null,st:'real'},
+    {v:'MED',ano:2026,tipo:'Normal',nome:'Janeiro',base:27573,propria:1369,conc:0,novos:4201,vendas:5624,pen:4.96,ticket:4888,roas:null,custo:null,cpl:null,leadsV:null,st:'real'},
+  ];
+
+  const VMETA={EC:{name:'Estratégia EC — Concursos',base:'Concursos'},CJ:{name:'Estratégia CJ — Jurídica',base:'ECJ'},MED:{name:'Estratégia MED — Medicina',base:'EMED'},EV:{name:'Estratégia EV — Vestibulares',base:'EVEST'}};
+  const VORDER=['CJ','EC','MED','EV'];
+  function penBar(p){return p==null?'':`<div class="penbar"><i style="width:${Math.min(p/12*100,100)}%"></i></div>`;}
+  function miniseg(b){
+    if(b.pen==null||b.novos==null) return '';
+    const t=(b.propria||0)+(b.conc||0)+(b.novos||0); const w=v=>t>0?(v||0)/t*100:0;
+    return `<div class="miniseg">
+      <span style="width:${w(b.propria)}%;background:#7c3aed"></span>
+      <span style="width:${w(b.conc)}%;background:#b07ef0"></span>
+      <span style="width:${w(b.novos)}%;background:#f5a524"></span></div>
+      <div class="segleg"><span style="color:#7c3aed">■ ${fmtInt(b.propria)} própria <small style="color:#b3bacb">+múlt</small></span><span style="color:#b07ef0">■ ${fmtInt(b.conc)} compl</span><span style="color:#d18a12">■ ${fmtInt(b.novos)} novos</span></div>`;
+  }
+  function alunoSplit(b){
+    const alunos = b.alunos!=null ? b.alunos : (b.propria!=null ? b.propria+(b.conc||0) : null);
+    if(alunos==null||b.novos==null) return '';
+    const nov=b.novos, t=alunos+nov;
+    if(t<=0) return '';
+    const pa=alunos/t*100, pn=nov/t*100;
+    return `<div class="alunobox"><div class="hd">Aluno × Não-aluno</div>
+      <div class="alunobar"><span style="width:${pa}%;background:#1f47d6">${pa>16?fmtPct(pa):''}</span><span style="width:${pn}%;background:#f5a524;color:#3a2a00">${pn>16?fmtPct(pn):''}</span></div>
+      <div class="alunolegs"><span style="color:#1f47d6">■ Alunos da base <b>${fmtInt(alunos)}</b></span><span style="color:#d18a12">■ Não-alunos <b>${fmtInt(nov)}</b></span></div>
+    </div>`;
+  }
+  let collapsed = {CJ:false};
+  function toggleGroup(v){ collapsed[v] = (collapsed[v]===false); renderBench(); }
+  function setAll(c){ VORDER.forEach(v=>collapsed[v]=c); renderBench(); }
+  function renderBench(){
+    const fv=$('fVert').value, fa=$('fAno').value, tp=$('fTipo').value;
+    const tipoOf=b=>b.tipo||'Vitalícia';
+    const anyFilter = !!(fv||fa||tp);
+    const html = VORDER.filter(v=>!fv||v===fv).map(v=>{
+      const rows=BENCH.filter(b=>b.v===v && (!fa||String(b.ano)===fa) && (!tp||tipoOf(b)===tp))
+        .sort((a,b)=> tipoOf(a)===tipoOf(b) ? a.ano-b.ano : (tipoOf(a)==='Vitalícia'?-1:1));
+      if(!rows.length) return '';
+      const cards=rows.map(b=>{
+        const i=BENCH.indexOf(b); const canUse=b.pen!=null&&b.novos!=null;
+        const nm = tipoOf(b)==='Normal' ? `<span class="badge normal">${b.nome||'normal'}</span>` : `<span class="badge vit">Vitalícia</span>`;
+        return `<div class="bcard">
+          <div class="top"><span class="yr">${b.ano}</span>${nm}<span class="badge ${b.st}">${b.st}</span></div>
+          <div class="row"><span>Base ativa (mês ant.)</span><b>${fmtInt(b.base)}</b></div>
+          <div style="margin:9px 0 2px"><div class="pen">${fmtPct(b.pen)}</div>${penBar(b.pen)}<div style="font-size:11px;color:var(--cinza)">penetração da base própria</div></div>
+          ${miniseg(b)}
+          ${alunoSplit(b)}
+          <div class="metrics">
+            <div><span>Investimento</span><b>${fmtInvest(b.invest)}</b></div>
+            <div><span>ROAS</span><b>${fmtN1(b.roas)}</b></div>
+            <div><span>Vendas</span><b>${fmtInt(b.vendas)}</b></div>
+            <div><span>Ticket</span><b>${fmtBRL(b.ticket)}</b></div>
+            <div><span>Custo/venda</span><b>${fmtBRL(b.custo)}</b></div>
+            <div><span>CPL</span><b>${fmtBRL(b.cpl)}</b></div>
+          </div>
+          <button class="usebtn" ${canUse?'':'disabled'} onclick="useBench(${i})">usar na calculadora ▶</button>
+        </div>`;
+      }).join('');
+      const isColl = !anyFilter && (collapsed[v]!==false);
+      const nVit = rows.filter(b=>tipoOf(b)==='Vitalícia').length, nNor = rows.length-nVit;
+      const pens = rows.filter(b=>b.pen!=null).map(b=>b.pen);
+      const parts=[]; if(nVit) parts.push(nVit+' Vitalícia'+(nVit>1?'s':'')); if(nNor) parts.push(nNor+' normal'+(nNor>1?'is':''));
+      const penR = pens.length ? ' · pen. '+fmtPct(Math.min(...pens))+'–'+fmtPct(Math.max(...pens)) : '';
+      return `<div class="vgroup ${isColl?'collapsed':''}"><div class="vgroup-head" onclick="toggleGroup('${v}')"><span class="chev">▸</span><span class="vtag ${v}">${v}</span><h3>${VMETA[v].name}</h3><span class="sub">${parts.join(' · ')}${penR} · base ${VMETA[v].base}</span></div><div class="bcards">${cards}</div></div>`;
+    }).join('');
+    $('benchGroups').innerHTML = html || `<div style="text-align:center;color:var(--cinza);padding:30px">Nenhum registro para o filtro.</div>`;
+  }
+
+  function useBench(i){
+    const b = BENCH[i];
+    if(b.base!=null) $('base').value = b.base;
+    if(b.pen!=null) $('pen').value = b.pen;
+    if(b.conc!=null) $('conc').value = b.conc;
+    if(b.novos!=null) $('novos').value = b.novos;
+    if(b.ticket!=null) $('ticket').value = b.ticket;
+    if(b.custo!=null) $('custo').value = b.custo;
+    calc();
+    showTab('calc');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  // ---------- calculator ----------
+  function calc(){
+    const base=+$('base').value||0, pen=(+$('pen').value||0)/100, conc=+$('conc').value||0,
+          novos=+$('novos').value||0, ticket=+$('ticket').value||0, custo=+$('custo').value||0, leadsV=5;
+    const propria=Math.round(base*pen), total=propria+conc+novos, fat=total*ticket, inv=total*custo;
+    const roas=inv>0?fat/inv:0, pct=fat>0?inv/fat*100:0, lucro=fat-inv, leads=total*leadsV, cpl=leadsV>0?custo/leadsV:0;
+    $('vBase').textContent=fmtInt(base); $('vPen').textContent=fmtPct(pen*100); $('vPropria').textContent=fmtInt(propria); $('vCusto').textContent=fmtBRL(custo);
+    $('oVendas').textContent=fmtInt(total); $('oFat').textContent=fmtMM(fat); $('oFatSub').textContent='ticket '+fmtBRL(ticket);
+    $('oInv').textContent=fmtMM(inv); $('oRoas').textContent=fmtN1(roas); $('oPct').textContent=fmtPct(pct); $('oLucro').textContent=fmtMM(lucro);
+    $('oLeads').textContent='~'+fmtInt(leads); $('oCpl').textContent='~'+fmtBRL(cpl);
+    const sP=total>0?propria/total*100:0, sC=total>0?conc/total*100:0, sN=total>0?novos/total*100:0;
+    $('seg').innerHTML =
+      `<span style="width:${sP}%;background:#7c3aed">${sP>9?'Própria · '+fmtInt(propria):''}</span>`+
+      `<span style="width:${sC}%;background:#b07ef0">${sC>9?'Compl. · '+fmtInt(conc):''}</span>`+
+      `<span style="width:${sN}%;background:#f5a524;color:#3a2a00">${sN>9?'Novos · '+fmtInt(novos):''}</span>`;
+    $('lPropria').innerHTML=fmtInt(propria)+' <small>'+fmtPct(sP)+'</small>';
+    $('lConc').innerHTML=fmtInt(conc)+' <small>'+fmtPct(sC)+'</small>';
+    $('lNovos').innerHTML=fmtInt(novos)+' <small>'+fmtPct(sN)+'</small>';
+  }
+
+  function preset(p){
+    if(p==='ec'){$('pen').value=7.5;$('conc').value=0;$('novos').value=900;}
+    if(p==='cj'){$('pen').value=8.0;$('conc').value=2700;$('novos').value=1700;}
+    if(p==='med'){$('base').value=26700;$('pen').value=8.0;$('conc').value=0;$('novos').value=1700;$('ticket').value=10000;$('custo').value=600;}
+    calc();
+  }
+
+  function showTab(t){
+    $('paneCalc').classList.toggle('show',t==='calc');
+    $('paneBench').classList.toggle('show',t==='bench');
+    $('tabCalc').classList.toggle('active',t==='calc');
+    $('tabBench').classList.toggle('active',t==='bench');
+  }
+
+  ['base','pen','conc','novos','ticket','custo'].forEach(id=>$(id).addEventListener('input',calc));
+  calc(); renderBench();
+</script>
+
+
+</body></html>
